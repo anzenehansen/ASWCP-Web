@@ -66,7 +66,7 @@ class reports(HandlersBase):
                     else:
                         self.write("0")
             elif act == "purge_reports":
-                self.db.reports.delete().where((self.db.reports.server==server) & (self.db.reports.user==self.get_uid)).execute()
-                self.db.reports.create(server=server,ts=int(time()),msg="Purged reports",title="Reports Purge",status=1,user=self.get_uid)
+                purged = self.db.reports.delete().where((self.db.reports.server==server) & (self.db.reports.user==self.get_uid)).execute()
+                self.db.reports.create(server=server,ts=int(time()),msg="User purged a total of %d reports" % purged,title="Reports Purge",status=1,user=self.get_uid)
                 
         self.finish()
