@@ -1,6 +1,7 @@
 from plugins.bases.handlers import HandlersBase
 
 import json
+from time import time
 
 class reports(HandlersBase):
     WEB_PATH = r"/reports"
@@ -64,5 +65,8 @@ class reports(HandlersBase):
                         self.write("1")
                     else:
                         self.write("0")
-                        
+            elif act == "purge_reports":
+                self.db.reports.delete().where((self.db.reports.server==server) & (self.db.reports.user==self.get_uid)).execute()
+                self.db.reports.create(server=server,ts=int(time()),msg="Purged reports",title="Reports Purge",status=1,user=self.get_uid)
+                
         self.finish()
