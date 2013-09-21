@@ -54,8 +54,6 @@ class HandlersBase(tornado.web.RequestHandler, PluginBase):
         dat = ""
         tmp = " "
         
-        print "> above while"
-        
         while True:
             tmp = str(sock.recv(1024))
             
@@ -63,8 +61,6 @@ class HandlersBase(tornado.web.RequestHandler, PluginBase):
                 break
                 
             dat = "%s%s" % (dat, tmp)
-        
-        print "> after while"
         
         if dat != "":
             try:
@@ -95,9 +91,7 @@ class HandlersBase(tornado.web.RequestHandler, PluginBase):
             sock.connect((ip, port))
         except:
             return False
-
-        print "> Sending request to",ip
-
+            
         sock.sendall(self.make_request(reqid, msg, pub, priv) + "\n")
 
         return self.get_response(sock)
