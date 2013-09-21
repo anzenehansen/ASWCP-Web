@@ -180,12 +180,12 @@ $("#perform_cc").click(function(e){
     e.preventDefault();
     var id = $("#ccd_srv").attr("data-sid");
     var cmd = $("#cc_cmd").val();
-    console.log(cmd);
+    
     $.post("/",
-    {action : "cc", server : id, cmd : cmd},
-    function (next_run){
-        $("#cc_notice").html("<br /><br />"+cmd+" is set to be processed at "+next_run+".  Once the results are returned a report will be generated and viewable.");
-    }
+        {action : "cc", server : id, cmd : cmd},
+        function (next_run){
+            $("#cc_notice").html("<br /><br />"+cmd+" is set to be processed at "+next_run+".  Once the results are returned a report will be generated and viewable.");
+        }
     );
 });
 
@@ -328,13 +328,13 @@ $(".reports").click(function(e){
         return date.toLocaleString();
     }
     
+    $("#reports_clear").attr('data-sid', sid);
     $("#reports_dialog_body").html("<div class=\"accordion\" id=\"accordion2\">");
     
     $.post("/reports",
         {action : "fetch_reports", server : sid, type : 0},
         function (dump){
             dump = JSON.parse(dump);
-            console.log(dump);
             var status = ["error", "success", "info"];
             var stat_id = 0;
             
@@ -360,6 +360,7 @@ $(".server_entry").on('click', '.icon-exclamation-sign', function(e){
         return date.toLocaleString();
     }
     
+    $("#reports_clear").attr('data-sid', sid);
     $("#reports_dialog_body").html("<div class=\"accordion\" id=\"accordion2\">");
     
     $.post("/reports",
@@ -374,7 +375,7 @@ $(".server_entry").on('click', '.icon-exclamation-sign', function(e){
                     stat_id = data['status'];
                 }
                 
-                $("#reports_dialog_body").append("<div class=\"accordion-group\"><div class=\"accordion-heading alert-"+status[stat_id]+"\" data-sid=\""+sid+"\" data-rid=\""+data['id']+"\"><a class=\"accordion-toggle\" data-toggle=\"collapse\" data-parent=\"#accordion2\" href=\"#collapse"+data['id']+"\">"+data['title']+" <div class=\"pull-right\">"+dateconv(data['ts'])+"</div></a></div><div id=\"collapse"+data['id']+"\" class=\"accordion-body collapse\"><div class=\"accordion-inner\"><pre class=\"pre-scrollable\">"+data['msg'].replace(/\n/g, '<br />')+"</pre></div></div></div>");
+                $("#reports_dialog_body").append("<div class=\"accordion-group\"><div class=\"accordion-heading alert-"+status[stat_id]+"\" data-sid=\""+sid+"\" data-rid=\""+data['id']+"\"><a class=\"accordion-toggle\" data-toggle=\"collapse\" data-parent=\"#accordion2\" href=\"#collapse"+data['id']+"\">"+data['title']+" <div class=\"pull-right\">"+dateconv(data['ts'])+"</div></a></div><div id=\"collapse"+data['id']+"\" class=\"accordion-body collapse\"><div class=\"accordion-inner\"><b>Report Made By</b>&nbsp;&nbsp;"+data['username']+"<br /><br /><pre class=\"pre-scrollable\">"+data['msg'].replace(/\n/g, '<br />')+"</pre></div></div></div>");
             });
         });
     
@@ -388,5 +389,17 @@ $("#reports_dialog_body").on('click', '.accordion-heading', function(e){
     
     $.post("/reports",
     {action : "update_report", server : sid, report_id : rid}
+    );
+});
+
+$("#reports_clear").click(function(e){
+    e.preventDefault();
+    var sid = $(this).attr('data-sid');
+    
+    $.post("/reports",
+        {action : "purge_reports", server : sid},
+        function (data){
+            $("#reports_dialog").modal('hide');
+        }
     );
 });
